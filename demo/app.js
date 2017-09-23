@@ -46,11 +46,11 @@ export default class App {
       this.behaviors[name] = new config.Klass(config.p)
     })
 
-    this.behaviors.drag.on('drop', this._onDrop.bind(this))
-    this.behaviors.drag.on('move', this._onNodeMove.bind(this))
+    this.behaviors.drag.on('drop', this._onDrop, this)
+    this.behaviors.drag.on('move', this._onNodeMove, this)
 
-    this.selection.on('add', this._onSelect.bind(this))
-    this.selection.on('remove', this._onDeselect.bind(this))
+    this.selection.on('add', this._onSelect, this)
+    this.selection.on('remove', this._onDeselect, this)
 
 
     this.renderControls()
@@ -99,7 +99,7 @@ export default class App {
       .html(d => d)
     this.nodes = this.updateNodes.merge(this.enterNodes)
     this.layout.update(data.graph)
-    this.layout.on('end', this.updatePosition.bind(this))
+    this.layout.on('end', this.updatePosition, this)
     this.layout.run()
   }
 
