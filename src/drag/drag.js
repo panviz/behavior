@@ -1,8 +1,7 @@
-/*
+/**
  * Drag behavior
  */
 import Behavior from '../behavior'
-import Util from '../../../core/util'
 import './drag.scss'
 
 /**
@@ -11,62 +10,46 @@ import './drag.scss'
  * this._target - node on which dragged node is dropped
  */
 export default class Drag extends Behavior {
-  constructor (p) {
-    super(p)
-    this.container = p.container
-  }
-
-  enable () {
-    super.enable()
-    this.container.on('mousedown', this.p.node.selector, this._start.bind(this))
-    this.container.on('mousemove', this._run.bind(this))
-    this.container.on('mouseenter', this.p.node.selector, this._prepareDrop.bind(this))
-    this.container.on('mouseleave', this.p.node.selector, this._disposeDrop.bind(this))
-    this.container.on('mouseup', this.p.node.selector, this._end.bind(this))
-    this.container.on('mouseup', this._end.bind(this))
-    this.container.addClass('drag')
-  }
-
-  disable () {
-    super.disable()
-    this.container.off('mousedown', this._start)
-    this.container.off('mousemove', this._run)
-    this.container.off('mouseenter', this._prepareDrop)
-    this.container.off('mouseleave', this._disposeDrop)
-    this.container.off('mouseup', this._end)
-    this.container.off('mouseup', this._end)
-    this.container.removeClass('drag')
+  get events () {
+    const node = this.p.node.selector
+    return {
+      [`mousedown ${node}`]: this._start,
+      mousemove: this._run,
+      [`mouseenter ${node}`]: this._prepareDrop,
+      [`mouseleave ${node}`]: this._disposeDrop,
+      [`mouseup ${node}`]: this._end,
+      mouseup: this._end,
+    }
   }
   /**
    * TODO show all selected nodes while dragging?
    */
   _start (e) {
+    if (!this._enabled) return false
     this._dragged = $(e.currentTarget)
     this._draggedClone = this._dragged.clone().addClass('dragging')
-    const offset = Util.getRelativeOffset(e, this.container[0])
-    this._startPoint = { x: offset.x, y: offset.y }
+    this._startPoint = { x: e.offsetX, y: e.offsetY }
 
     this.container.append(this._draggedClone)
-    this.container.addClass('in-progress')
-    this._inProgress = true
+    return super._start()
   }
 
   _run (e) {
-    if (!this._inProgress) return
-    const offset = Util.getRelativeOffset(e, this.container[0])
-    if (Math.abs(offset.x - this._startPoint.x) < 2 &&
-        Math.abs(offset.y - this._startPoint.y) < 2) return
+    if (!this._inProgress) return false
+    if (Math.abs(e.offsetX - this._startPoint.x) < 3 &&
+         Math.abs(e.offsetY - this._startPoint.y) < 3) return false
 
     if (!this._draggedClone.is(':visible')) {
       this._draggedClone.show()
     }
-    this._draggedClone.translate(offset.x, offset.y)
+    this._draggedClone.translate(e.offsetX, e.offsetY)
+    return super._run()
   }
 
   _prepareDrop (e) {
     if (!this._inProgress) return
 
-    // restrict this dropping
+    // restrict self dropping
     if (e.currentTarget === this._dragged[0]) return
     this._target = $(e.currentTarget)
     this._target.addClass('dropTarget')
@@ -75,28 +58,28 @@ export default class Drag extends Behavior {
   _disposeDrop (e) {
     if (!this._inProgress || !this._target) return
     this._target.removeClass('dropTarget')
-    this._target = undefined
+    delete this._target
   }
 
   _end (e) {
     if (!this._inProgress) return
-    const offset = Util.getRelativeOffset(e, this.container[0])
+    this._draggedClone.remove()
+    super._end()
+
     if (this._target) {
-      this.trigger('drop', this._target)
+      this.emit('drop', this._target, this._dragged)
     } else {
       const delta = {}
-      delta.x = offset.x - this._startPoint.x
-      delta.y = offset.y - this._startPoint.y
-      const nodeHalfWidth = this.p.node.size.width / 2
-      if (Math.abs(delta.x) > nodeHalfWidth || Math.abs(delta.y) > nodeHalfWidth) {
-        this.trigger('move', delta)
+      delta.x = e.offsetX - this._startPoint.x
+      delta.y = e.offsetY - this._startPoint.y
+
+      if (Math.abs(delta.x) > this.p.moveThreshold || Math.abs(delta.y) > this.p.moveThreshold) {
+        this.emit('move', delta, this._dragged[0])
       }
     }
 
-    this._startPoint = undefined
+    delete this._startPoint
+    delete this._dragged
     this._disposeDrop()
-    this._draggedClone.remove()
-    this.container.removeClass('in-progress')
-    this._inProgress = false
   }
 }

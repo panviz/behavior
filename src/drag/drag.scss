@@ -1,4 +1,4 @@
-.behavior.drag {
+.behavior.Drag {
   .node {
     // draggable node
     cursor: grab;
@@ -6,11 +6,9 @@
     cursor: -moz-grab;
 
     &.dragging {
-      display: none;
       z-index: 3;
       pointer-events: none;
-
-
+      opacity: 0.3;
     }
   }
   &.in-progress, &.in-progress .node {

@@ -3,7 +3,6 @@
  * allows multiple
  */
 import Behavior from '../behavior'
-import './selectioning.scss'
 
 export default class Selectioning extends Behavior {
   constructor (p) {
@@ -32,12 +31,10 @@ export default class Selectioning extends Behavior {
 
     if (e[this.modeKey] === false) {
       this.selection.add(key)
+    } else if (this.selection.get(key)) {
+      this.selection.remove(key)
     } else {
-      if (this.selection.get(key)) {
-        this.selection.remove(key)
-      } else {
-        this.selection.add(key)
-      }
+      this.selection.add(key)
     }
   }
 

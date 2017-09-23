@@ -1,0 +1,145 @@
+import * as d3Selection from 'd3-selection'
+import Collection from 'collection'
+import Grid from 'layout/src/grid'
+
+import Pan from '../src/pan/pan'
+import Drag from '../src/drag/drag'
+import Selectioning from '../src/selectioning/selectioning'
+
+import './app.scss'
+import data from './data.json'
+
+export default class App {
+  constructor () {
+    this.selection = new Collection
+    this.container = d3Selection.select('.container')
+    this.graph = $('.graph')
+    const Behaviors = {
+      pan: {
+        Klass: Pan,
+        p: {
+          element: this.graph.find('.canvas'),
+        },
+      },
+      drag: {
+        Klass: Drag,
+        p: {
+          node: {
+            selector: '.node',
+          },
+          moveThreshold: 16,
+        },
+      },
+      selectioning: {
+        Klass: Selectioning,
+        p: {
+          selection: this.selection,
+          node: {
+            selector: '.node',
+          },
+        },
+      },
+    }
+    this.behaviors = {}
+    _.each(Behaviors, (config, name) => {
+      _.extend(config.p, { container: this.graph })
+      this.behaviors[name] = new config.Klass(config.p)
+    })
+
+    this.behaviors.drag.on('drop', this._onDrop.bind(this))
+    this.behaviors.drag.on('move', this._onNodeMove.bind(this))
+
+    this.selection.on('add', this._onSelect.bind(this))
+    this.selection.on('remove', this._onDeselect.bind(this))
+
+
+    this.renderControls()
+    this.layout = new Grid({
+      width: this.graph[0].getBoundingClientRect().width,
+      node: { width: 144, height: 32 },
+      offset: { x: 8, y: 8 },
+    })
+    this.renderData()
+  }
+
+  renderControls () {
+    const controls = d3Selection.select('.controls').selectAll('div')
+      .data(_.values(this.behaviors))
+      .enter()
+    const behaviorControls = controls
+      .append('div')
+      .attr('class', d => d.constructor.name)
+      .html(d => d.constructor.name)
+    behaviorControls
+      .append('div')
+      .attr('class', 'btn enable')
+      .on('click', (d) => { d.enabled = !d.enabled })
+      .each((d, i, els) => {
+        d.on('enabled', state => $(els[i]).toggleClass('active', state))
+      })
+    behaviorControls
+      .append('div')
+      .attr('class', 'is-in-progress')
+      .each((d) => {
+        function statusHighlight () {
+          d3Selection.select(`.controls .${d.constructor.name}`).classed('active', d.state)
+        }
+        d.on('start', statusHighlight)
+        d.on('run', statusHighlight)
+        d.on('end', statusHighlight)
+      })
+  }
+
+  renderData () {
+    this.updateNodes = this.container.select('.graph .canvas').selectAll('.node').data(data.graph)
+    this.enterNodes = this.updateNodes.enter()
+      .append('div')
+      .attr('class', 'node')
+      .style('background', d => d)
+      .html(d => d)
+    this.nodes = this.updateNodes.merge(this.enterNodes)
+    this.layout.update(data.graph)
+    this.layout.on('end', this.updatePosition.bind(this))
+    this.layout.run()
+  }
+
+  updatePosition () {
+    const coords = this.layout.coords
+    const nodes = $('.node')
+    _.each(nodes, (node, i) => {
+      const coord = coords[i]
+      $(node).css({ transform: `translate(${coord.x}px, ${coord.y}px)` })
+    })
+  }
+
+  _onDrop (targetNode) {
+    if (!targetNode) return
+    this.actionman.get('itemLink').apply(targetNode[0].__data__)
+  }
+
+  _onNodeMove (delta, node) {
+    let keys = this.selection.getAll()
+    if (_.isEmpty(keys) && node) keys = [node.__data__]
+    _.each(keys, (key) => {
+      const _node = _.find(this.nodes.nodes(), __node => __node.__data__ === key)
+      const item = _node.__data__
+      this.layout.move(data.graph.indexOf(item), delta)
+    })
+    this.updatePosition()
+  }
+
+  _onSelect (keys) {
+    _.each(keys, (key) => {
+      const node = _.find(this.nodes.nodes(), _node => _node.__data__ === key)
+      if (node) node.classList.add('selected')
+    })
+  }
+
+  _onDeselect (keys) {
+    _.each(keys, (key) => {
+      const node = _.find(this.nodes.nodes(), _node => _node.__data__ === key)
+      if (node) node.classList.remove('selected')
+    })
+  }
+}
+new App() // eslint-disable-line

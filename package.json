@@ -1,0 +1,66 @@
+{
+  "name": "Graphiy.behavior",
+  "version": "0.0.1",
+  "description": "Behavior",
+  "main": "dist/bundle.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Graphiy/behavior"
+  },
+  "homepage": "",
+  "keywords": [
+    "user interactions",
+    "data visualization"
+  ],
+  "license": "GPL-3.0+",
+  "scripts": {
+    "build": "webpack",
+    "lint": "eslint .",
+    "test": "yarn lint",
+    "start": "webpack-dev-server --port 8006"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "browsers": [
+              "chrome >= 59"
+            ]
+          }
+        }
+      ]
+    ]
+  },
+  "dependencies": {
+    "eventemitter3": "^2.0.3",
+    "collection": "Graphiy/collection",
+    "transform": "Graphiy/transform"
+  },
+  "peerDependencies": {
+    "jquery": "3.x",
+    "lodash": "4.x"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
+    "css-loader": "^0.28.4",
+    "d3-dsv": "^1.0.7",
+    "d3-selection": "^1.1.0",
+    "eslint": "^4.3.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.1.0",
+    "extract-text-webpack-plugin": "2.1.2",
+    "layout": "git://github.com/Graphiy/layout.git#dev",
+    "mocha": "^3.5.0",
+    "node-sass": "^4.5.3",
+    "raw-loader": "^0.5.1",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.4.1",
+    "webpack-dev-server": "^2.7.1"
+  }
+}

@@ -1,0 +1,65 @@
+.controls > div {
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  font-weight: bold;
+
+  div {
+    height: 20px;
+    font-weight: normal;
+  }
+
+  .btn {
+    width: 100px;
+    padding: 4px;
+    font-weight: normal;
+    border: 1px solid grey;
+    user-select: none;
+
+    &:after {
+      content: 'Enable';
+    }
+    &.active {
+      background: lawnGreen;
+      &:after {
+        content: 'Disable';
+      }
+    }
+  }
+  &.active {
+    .is-in-progress {
+      background: mediumvioletred;
+      &:after {
+        content: 'In Progress';
+      }
+    }
+  }
+}
+
+.container {
+  display: flex;
+  height: 500px;
+  margin-top: 16px;
+
+  & > div {
+    flex: 1 1 auto;
+    border: 1px solid grey;
+    overflow: auto;
+
+    .canvas {
+      width: fit-content;
+    }
+  }
+
+  .node {
+    position: absolute;
+    width: 128px;
+    padding: 4px;
+    text-align: center;
+    user-select: none;
+
+    &.selected {
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    }
+  }
+}

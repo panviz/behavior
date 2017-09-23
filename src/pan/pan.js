@@ -7,6 +7,14 @@ import Behavior from '../behavior'
 import './pan.scss'
 
 export default class Pan extends Behavior {
+  static get defaults () {
+    return {
+      wheelStep: 1,
+      keyStep: 30,
+    }
+  }
+
+  static get controlKeys () { return ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'] }
   /**
    * _startPoint - coordinates of pointing device relative to the canvas
    * @param Number p.wheelStep pixels to move on mouse wheel
@@ -14,35 +22,20 @@ export default class Pan extends Behavior {
    */
   constructor (p) {
     super(p)
-    this.p = _.extend({
-      wheelStep: 1,
-      keyStep: 30,
-    }, this.p)
-    this._controlKeys = ['Up', 'Down', 'Left', 'Right']
     this._startPoint = {}
     this._changed = false
 
-    this.container = p.container
-    this._element = p.panElement
+    this._element = p.element
     $(document).on('keydown', this._onKeyDown.bind(this))
   }
 
-  enable () {
-    super.enable()
-    this.container.on('mousedown', this._onMouseDown.bind(this))
-    this.container.on('mousemove', this._onMouseMove.bind(this))
-    this.container.on('mouseup', this._end.bind(this))
-    this.container.on('mousewheel', this._onScroll.bind(this))
-    this.container.addClass('pan')
-  }
-
-  disable () {
-    super.disable()
-    this.container.off('mousedown', this._onMouseDown)
-    this.container.off('mousemove', this._onMouseMove)
-    this.container.off('mouseup', this._end)
-    this.container.off('mousewheel', this._onScroll)
-    this.container.removeClass('pan')
+  get events () {
+    return {
+      mousedown: this._onMouseDown,
+      mousemove: this._onMouseMove,
+      mouseup: this._end,
+      mousewheel: this._onScroll,
+    }
   }
   /**
    * @return {x,y} current canvas absolute position
@@ -62,7 +55,7 @@ export default class Pan extends Behavior {
     } else {
       this._moveTo(x, y, silent)
     }
-    if (!silent) this.trigger('end')
+    if (!silent) this.emit('end')
   }
   /**
    * shift canvas on specified distance {deltaX, deltaY}
@@ -77,7 +70,7 @@ export default class Pan extends Behavior {
   _moveTo (x, y, silent) {
     if (y !== undefined) this._element.translateY(y)
     if (x !== undefined) this._element.translateX(x)
-    if (!silent) this.trigger('change')
+    if (!silent) this.emit('change')
   }
   /**
    * Sets this._startPoint
@@ -85,34 +78,36 @@ export default class Pan extends Behavior {
    * @param Number y absolute window coordinate where movement starts
    */
   _start (x, y, force) {
-    if (!this._enabled) return
+    if (!this._enabled) return false
     this._inProgress = true
     this._changed = false
     const current = this.getPosition()
 
     this._startPoint.x = x - current.x
     this._startPoint.y = y - current.y
+    return super._start()
   }
 
   _run (x, y) {
-    if (!this._inProgress) return
+    if (!this._inProgress) return false
 
     // Ignore small shift
     const current = this.getPosition()
-    if (Math.abs(x - this._startPoint.x - current.x) < 2 &&
-         Math.abs(y - this._startPoint.y - current.y) < 2) {
-      return
+    if (Math.abs(x - this._startPoint.x - current.x) < 3 &&
+         Math.abs(y - this._startPoint.y - current.y) < 3) {
+      return false
     }
 
     this._changed = true
     const posX = x - this._startPoint.x
     const posY = y - this._startPoint.y
     this._moveTo(posX, posY)
+    return super._run()
   }
 
   _end () {
     if (this._inProgress && this._changed) {
-      this.trigger('end')
+      super._end()
     }
     this._inProgress = false
     this._changed = false
@@ -146,34 +141,25 @@ export default class Pan extends Behavior {
 
   _onKeyDown (e) {
     e = e.originalEvent // eslint-disable-line
-    if (!('keyIdentifier' in e)) {
-      e.keyIdentifier = e.key // eslint-disable-line
-    }
-    if (!_.includes(this._controlKeys, e.keyIdentifier)) return
+    if (!this.enabled || !_.includes(Pan.controlKeys, e.key)) return
 
-    let turnOff = false
-    if (!this._enabled) {
-      this._enabled = true
-      turnOff = true
-    }
     this._start(0, 0)
 
-    switch (e.keyIdentifier) {
-    case 'Up':
+    switch (e.key) {
+    case 'ArrowUp':
       this._run(0, -this.p.keyStep)
       break
-    case 'Down':
+    case 'ArrowDown':
       this._run(0, this.p.keyStep)
       break
-    case 'Left':
+    case 'ArrowLeft':
       this._run(-this.p.keyStep, 0)
       break
-    case 'Right':
+    case 'ArrowRight':
       this._run(this.p.keyStep, 0)
       break
     default:
     }
     this._end()
-    if (turnOff) this._enabled = false
   }
 }
