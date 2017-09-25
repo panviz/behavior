@@ -104,7 +104,7 @@ export default class App {
   }
 
   updatePosition () {
-    const coords = this.layout.coords
+    const { coords } = this.layout
     const nodes = $('.node')
     _.each(nodes, (node, i) => {
       const coord = coords[i]
