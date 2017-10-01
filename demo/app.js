@@ -1,6 +1,6 @@
 import * as d3Selection from 'd3-selection'
-import Collection from 'collection'
-import Grid from 'layout/src/grid'
+import Collection from '@graphiy/collection'
+import { Grid } from '@graphiy/layout'
 
 import Pan from '../src/pan/pan'
 import Drag from '../src/drag/drag'

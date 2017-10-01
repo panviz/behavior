@@ -3,6 +3,8 @@
  */
 import Behavior from '../behavior'
 import './rectangular.scss'
+// TODO import Util
+const Util = {}
 
 $.fn.cssInt = function (prop, value) {
   if (value !== undefined) this.css(prop, `${value}px`)
@@ -84,13 +86,13 @@ export default class Rectangular extends Behavior {
     this._element.cssInt('height', 0)
     this._element.hide()
 
-    // TODO replace global object usage
-    const toSelect = _.map(G.graphView._nodes.nodes(), (node) => {
+    // TODO this._nodes selection may change since this initialization
+    const toSelect = _.map(this._nodes, (node) => {
       if (this._isNodeSelected(node)) return node.__data__
       return undefined
     })
     this.selection.add(toSelect)
-    rect.width = rect.height = 0
+    rect.width = rect.height = 0 // eslint-disable-line
   }
   /**
    * @param node Node
@@ -98,8 +100,8 @@ export default class Rectangular extends Behavior {
   _isNodeSelected (node) {
     const nodeBounding = node.getBoundingClientRect()
     const nodeCenter = {}
-    nodeCenter.x = nodeBounding.left + nodeBounding.width / 2
-    nodeCenter.y = nodeBounding.top + nodeBounding.height / 2
+    nodeCenter.x = nodeBounding.left + (nodeBounding.width / 2)
+    nodeCenter.y = nodeBounding.top + (nodeBounding.height / 2)
     const rect = {
       left: this._rect.topLeftPoint.x,
       top: this._rect.topLeftPoint.y,
