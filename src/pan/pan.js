@@ -106,7 +106,7 @@ export default class Pan extends Behavior {
   }
 
   _end () {
-    if (this._inProgress && this._changed) {
+    if (this._inProgress) {
       super._end()
     }
     this._inProgress = false

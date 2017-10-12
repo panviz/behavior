@@ -88,6 +88,11 @@ export default class App {
         d.on('run', statusHighlight)
         d.on('end', statusHighlight)
       })
+
+    d3Selection.select('.Drag')
+      .append('div')
+      .html('Dragged')
+      .classed('dragged', true)
   }
 
   renderData () {
@@ -114,7 +119,10 @@ export default class App {
 
   _onDrop (targetNode) {
     if (!targetNode) return
-    this.actionman.get('itemLink').apply(targetNode[0].__data__)
+    d3Selection.select('.dragged')
+      .classed('active', true)
+
+    // this.actionman.get('itemLink').apply(targetNode[0].__data__)
   }
 
   _onNodeMove (delta, node) {
