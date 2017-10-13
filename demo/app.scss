@@ -40,9 +40,9 @@
     width: 110px;
     top: 55px;
 
-    .dragged {
+    .dragged, .select {
       opacity: 1;
-      height: 20px;
+      height: 21px;
 
       &.active {
         opacity: 0;

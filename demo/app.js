@@ -46,7 +46,7 @@ export default class App {
       this.behaviors[name] = new config.Klass(config.p)
     })
 
-    this.behaviors.drag.on('drop', this._onDrop, this)
+    this.behaviors.drag.on('drop', App.onDrop, this)
     this.behaviors.drag.on('move', this._onNodeMove, this)
 
     this.selection.on('add', this._onSelect, this)
@@ -95,6 +95,13 @@ export default class App {
       .append('div')
       .html('Dragged')
       .classed('dragged', true)
+
+    d3Selection.select('.Selectioning')
+      .append('div')
+      .classed('notification', true)
+      .append('div')
+      .html('Select')
+      .classed('select', true)
   }
 
   renderData () {
@@ -119,9 +126,9 @@ export default class App {
     })
   }
 
-  _onDrop (targetNode) {
+  static onDrop (targetNode) {
     if (!targetNode) return
-    d3Selection.select('.notification')
+    d3Selection.select('.Drag .notification')
       .style('opacity', 1)
     d3Selection.select('.dragged')
       .classed('active', true)
@@ -145,6 +152,16 @@ export default class App {
   }
 
   _onSelect (keys) {
+    d3Selection.select('.Selectioning .notification')
+      .style('opacity', 1)
+    d3Selection.select('.select')
+      .classed('active', true)
+    setTimeout(() => {
+      d3Selection.select('.Selectioning .notification')
+        .style('opacity', 0)
+      d3Selection.select('.select')
+        .classed('active', false)
+    }, 1000)
     _.each(keys, (key) => {
       const node = _.find(this.nodes.nodes(), _node => _node.__data__ === key)
       if (node) node.classList.add('selected')
