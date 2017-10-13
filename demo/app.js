@@ -91,6 +91,8 @@ export default class App {
 
     d3Selection.select('.Drag')
       .append('div')
+      .classed('notification', true)
+      .append('div')
       .html('Dragged')
       .classed('dragged', true)
   }
@@ -119,10 +121,16 @@ export default class App {
 
   _onDrop (targetNode) {
     if (!targetNode) return
+    d3Selection.select('.notification')
+      .style('opacity', 1)
     d3Selection.select('.dragged')
       .classed('active', true)
-
-    // this.actionman.get('itemLink').apply(targetNode[0].__data__)
+    setTimeout(() => {
+      d3Selection.select('.notification')
+        .style('opacity', 0)
+      d3Selection.select('.dragged')
+        .classed('active', false)
+    }, 1000)
   }
 
   _onNodeMove (delta, node) {

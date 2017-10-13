@@ -34,16 +34,23 @@
       }
     }
   }
-  .dragged {
-    border: 1px solid black;
-    opacity: 1;
+  .notification {
+    opacity: 0;
+    position: absolute;
+    width: 110px;
+    top: 55px;
 
+    .dragged {
+      opacity: 1;
+      height: 20px;
 
-    &.active {
-      opacity: 0;
-      transition: opacity 3s;
+      &.active {
+        opacity: 0;
+        transition: opacity 1s;
+        background: mediumvioletred;
+      }
     }
-  }
+}
 }
 
 .container {
