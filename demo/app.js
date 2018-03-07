@@ -56,8 +56,9 @@ export default class App {
     this.renderControls()
     this.layout = new Grid({
       width: this.graph[0].getBoundingClientRect().width,
-      node: { width: 144, height: 32 },
+      cell: { width: 144, height: 32 },
       offset: { x: 8, y: 8 },
+      name: 'Grid',
     })
     this.renderData()
   }

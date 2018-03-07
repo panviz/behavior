@@ -14,9 +14,10 @@ export default class Selectioning extends Behavior {
   }
 
   get events () {
+    const node = this.p.node.selector
     return {
-      [`mousedown ${this._nodeSelector}`]: this._onMouseDownNode,
-      [`mouseup ${this._nodeSelector}`]: this._onMouseUpNode,
+      [`mousedown ${node}`]: this._onMouseDownNode,
+      [`mouseup ${node}`]: this._onMouseUpNode,
       mousedown: this._onMouseDownBase,
     }
   }
