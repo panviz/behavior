@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@graphiy/eslint-config": "graphiy/eslint-config",
-    "@graphiy/layout": "graphiy/layout",
+    "@graphiy/layout": "graphiy/layout#dev",
     "babel-cli": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "css-loader": "^0.28.4",
