@@ -95,6 +95,7 @@ export default class Drag extends Behavior {
 
     if (this._target) {
       this.emit('drop', this._target, this._dragged)
+      delete this._target
     } else {
       const offset = Drag._getRelativeOffset(e, this.container[0])
       const delta = {}
