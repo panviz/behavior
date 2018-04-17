@@ -28,25 +28,28 @@ export default class Selectioning extends Behavior {
   }
 
   _onMouseDownNode (e) {
-    const key = e.currentTarget.__data__
+    this.key = e.currentTarget.__data__
 
     if (e[this.modeKey] === false) {
-      this.selection.add(key)
-    } else if (this.selection.get(key)) {
-      this.selection.remove(key)
+      this.selection.add(this.key)
+    } else if (this.selection.get(this.key)) {
+      this.selection.remove(this.key)
     } else {
-      this.selection.add(key)
+      this.selection.add(this.key)
     }
   }
 
   _onMouseUpNode (e) {
     const key = e.currentTarget.__data__
-    const selected = this.selection.getAll()
+    if (this.key === key) {
+      const selected = this.selection.getAll()
 
-    // deselect all except current
-    if (e[this.modeKey] === false) {
-      const unselect = _.without(selected, key)
-      this.selection.remove(unselect)
+      // deselect all except current
+      if (e[this.modeKey] === false) {
+        const unselect = _.without(selected, key)
+        this.selection.remove(unselect)
+      }
     }
+    delete this.key
   }
 }
