@@ -15,16 +15,18 @@
     "url": "https://github.com/Graphiy/behavior"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "yarn build:lib && yarn build:demo",
+    "build:lib": "webpack --mode=production",
+    "build:demo": "cd demo/ && webpack --mode=production",
     "lint": "eslint . --ignore-path .gitignore",
-    "start": "webpack-dev-server --config demo/webpack.config.babel.js --port 8006",
-    "pretest": "yarn lint",
-    "test": "yarn lint"
+    "start": "cd demo/ && webpack-dev-server --port 8006",
+    "test": "webpack-dev-server --config webpack.config.babel.js --port 8006",
+    "deploy": "cd demo/ && rsync -azP --delete dist/ index.html data.json daviste.com:/home/dmitra/daviste.com/static/demo/graphiy-behavior"
   },
   "babel": {
     "presets": [
       [
-        "env",
+        "@babel/preset-env",
         {
           "targets": {
             "browsers": [
@@ -48,33 +50,34 @@
   },
   "dependencies": {
     "@graphiy/collection": "^0.1.0",
-    "@graphiy/transform": "^0.1.0",
-    "eventemitter3": "^3.1.0"
+    "@graphiy/transform": "^0.3.0",
+    "eventemitter3": "^4.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
     "@graphiy/eslint-config": "^0.1.0",
     "@graphiy/layout": "^0.1.0",
-    "babel-cli": "^6.24.1",
-    "babel-preset-env": "^1.6.0",
-    "css-loader": "^0.28.4",
-    "d3-dsv": "^1.0.7",
-    "d3-selection": "^1.1.0",
-    "eslint": "^4.6.0",
-    "jquery": "^3.3.1",
-    "lodash": "^4.17.10",
-    "mocha": "^5.2.0",
-    "node-sass": "^4.5.3",
+    "css-loader": "^3.2.0",
+    "d3-dsv": "^1.1.1",
+    "d3-selection": "^1.4.0",
+    "eslint": "^6.3.0",
+    "jasmine-core": "^3.4.0",
+    "lodash": "^4.17.15",
+    "node-sass": "^4.9.0",
     "pre-commit": "^1.2.2",
-    "raw-loader": "^0.5.1",
-    "sass-loader": "^7.0.3",
-    "style-loader": "^0.21.0",
-    "webpack": "^4.12.0",
-    "webpack-cli": "^3.0.3",
-    "webpack-dev-server": "^3.1.4"
+    "raw-loader": "^3.1.0",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.7",
+    "webpack-dev-server": "^3.8.0"
   },
   "peerDependencies": {
     "jquery": "3.x",
     "lodash": "4.x"
   },
-  "precommit": "test"
+  "precommit": "lint"
 }

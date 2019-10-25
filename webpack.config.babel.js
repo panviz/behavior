@@ -1,15 +1,20 @@
 import path from 'path'
 
-export default () => (
-  {
-    mode: 'production',
-    entry: {
-      behavior: './index.js',
-    },
-    output: {
-      path: path.join(__dirname, 'dist'),
-      filename: '[name].js',
-    },
-    devtool: 'source-map',
-  }
-)
+export default () => ({
+  mode: 'development',
+  entry: {
+    behavior: './index.js',
+    test: './test/specs',
+  },
+  module: {
+    rules: [{
+      test: /\.(scss|css)$/,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: '[name].js',
+  },
+  devtool: 'source-map',
+})
