@@ -1,6 +1,6 @@
 {
   "name": "@graphiy/behavior",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Behavior",
   "keywords": [
     "data visualization",
@@ -40,7 +40,7 @@
   "eslintConfig": {
     "env": {
       "browser": true,
-      "mocha": true
+      "jasmine": true
     },
     "extends": "@graphiy/eslint-config",
     "globals": {
@@ -76,7 +76,6 @@
     "webpack-dev-server": "^3.8.0"
   },
   "peerDependencies": {
-    "jquery": "3.x",
     "lodash": "4.x"
   },
   "precommit": "lint"

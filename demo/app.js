@@ -13,12 +13,12 @@ export default class App {
   constructor () {
     this.selection = new Collection
     this.container = d3Selection.select('.container')
-    this.graph = $('.graph')
+    this.graph = document.querySelector('.graph')
     const Behaviors = {
       pan: {
         Klass: Pan,
         p: {
-          element: this.graph.find('.canvas'),
+          element: this.graph.querySelector('.canvas'),
         },
       },
       drag: {
@@ -55,7 +55,7 @@ export default class App {
 
     this.renderControls()
     this.layout = new Grid({
-      width: this.graph[0].getBoundingClientRect().width,
+      width: this.graph.getBoundingClientRect().width,
       cell: { width: 144, height: 32 },
       offset: { x: 8, y: 8 },
       name: 'Grid',
@@ -76,7 +76,7 @@ export default class App {
       .attr('class', 'btn enable')
       .on('click', (d) => { d.enabled = !d.enabled })
       .each((d, i, els) => {
-        d.on('enabled', state => $(els[i]).toggleClass('active', state))
+        d.on('enabled', state => els[i].classList.toggle('active', state))
       })
     behaviorControls
       .append('div')
@@ -111,6 +111,8 @@ export default class App {
       .append('div')
       .attr('class', 'node')
       .style('background', d => d)
+    this.enterNodes
+      .append('span')
       .html(d => d)
     this.nodes = this.updateNodes.merge(this.enterNodes)
     this.layout.update(data.graph)
@@ -120,10 +122,10 @@ export default class App {
 
   updatePosition () {
     const { coords } = this.layout
-    const nodes = $('.node')
+    const nodes = document.querySelectorAll('.node')
     _.each(nodes, (node, i) => {
       const coord = coords[i]
-      $(node).css({ transform: `translate(${coord.x}px, ${coord.y}px)` })
+      node.style.transform = `translate(${coord.x}px, ${coord.y}px)`
     })
   }
 

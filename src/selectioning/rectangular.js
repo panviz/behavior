@@ -1,4 +1,4 @@
-/*
+/**
  * Rectangular selection
  */
 import Behavior from '../behavior'
@@ -12,6 +12,7 @@ $.fn.cssInt = function (prop, value) {
 }
 
 export default class Rectangular extends Behavior {
+  static get name () { return 'Rectangular' }
   constructor (p) {
     super(p)
 
@@ -19,7 +20,7 @@ export default class Rectangular extends Behavior {
     this._nodes = p.nodes
     this._eventTarget = p.eventTarget
     this._element = $('<div class="selectioningRectangle"></div>')
-    this.container.append(this._element)
+    this.container.appendChild(this._element)
 
     this._rect = { topLeftPoint: {} }
   }

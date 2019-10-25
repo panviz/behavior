@@ -2,6 +2,7 @@
  * Behavior interface
  */
 import EventEmitter from 'eventemitter3'
+import { on, off } from './events'
 
 export default class Behavior extends EventEmitter {
   constructor (options) {
@@ -18,10 +19,12 @@ export default class Behavior extends EventEmitter {
     if (this._enabled === state) return false
     this._enabled = state
     const eventNamespace = this.constructor.name
-    if (state) Behavior._delegate(this.container, this.events, this, eventNamespace)
-    else this.container.off(`.${eventNamespace}`)
-    this.container.toggleClass(this.constructor.name, state)
-    this.container.addClass('behavior')
+    if (state) this._setHandlers(this.container, this.events)
+    else off(this.container, `.${eventNamespace}`)
+    if (state) this._setHandlers(document, this.globalEvents)
+    else off(this.container, `.${eventNamespace}`)
+    this.container.classList.toggle(this.constructor.name, state)
+    this.container.classList.add('behavior')
     this.emit('enabled', this._enabled)
     return true
   }
@@ -73,19 +76,18 @@ export default class Behavior extends EventEmitter {
     this.emit('end')
   }
 
-  static _delegate (el, events, context, namespace) {
-    const $el = el instanceof $ ? el : $(el)
+  _setHandlers (target, events) {
+    const namespace = this.constructor.name
     if (!events) return
-    $el.off(`.${namespace}`)
+    off(target, `.${namespace}`)
 
     for (let key in events) { //eslint-disable-line
       let method = events[key]
-      if (!_.isFunction(method)) method = context[method]
+      if (!_.isFunction(method)) method = this[method]
       if (!method) continue
-      if (context) method = _.bind(method, context)
+      method = method.bind(this)
       const [, eventName, selector] = key.match(/^(\S+)\s*(.*)$/)
-
-      $el.on(`${eventName}.${namespace}`, selector, method)
+      on(target, `${eventName}.${namespace}`, method, selector)
     }
   }
 }

@@ -1,10 +1,12 @@
-/*
+/**
  * Selection by click
  * allows multiple
  */
 import Behavior from '../behavior'
+import './selectioning.scss'
 
 export default class Selectioning extends Behavior {
+  static get name () { return 'Selectioning' }
   constructor (p) {
     super(p)
     this.modeKey = 'ctrlKey'
@@ -23,12 +25,11 @@ export default class Selectioning extends Behavior {
   }
 
   _onMouseDownBase (e) {
-    if (e.target !== e.currentTarget) return
     if (e[this.modeKey] === false) this.selection.clear()
   }
 
-  _onMouseDownNode (e) {
-    this.key = e.currentTarget.__data__
+  _onMouseDownNode (e, currentTarget) {
+    this.key = currentTarget.__data__
 
     if (e[this.modeKey] === false) {
       this.selection.add(this.key)
@@ -39,8 +40,8 @@ export default class Selectioning extends Behavior {
     }
   }
 
-  _onMouseUpNode (e) {
-    const key = e.currentTarget.__data__
+  _onMouseUpNode (e, currentTarget) {
+    const key = currentTarget.__data__
     if (this.key === key) {
       const selected = this.selection.getAll()
 

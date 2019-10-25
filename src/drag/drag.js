@@ -1,39 +1,17 @@
 /**
  * Drag behavior
  */
+import { translate } from '@graphiy/transform'
 import Behavior from '../behavior'
+import { getRelativeOffset, isVisible } from '../util'
 import './drag.scss'
-
 /**
  * this._dragged - node on which dragging started
  * this._draggedClone - copy of the node on which dragging started - to visualize dragging
  * this._target - node on which dragged node is dropped
  */
 export default class Drag extends Behavior {
-  static _getRelativeOffset (e, ancestor) {
-    const target = e.target
-    let offsetX = e.offsetX
-    let offsetY = e.offsetY
-
-    function getOffset (element) {
-      if (element === ancestor) return
-
-
-      if (element.style.transform) {
-        const matrix = $(element).transform()
-        offsetX += matrix[4]
-        offsetY += matrix[5]
-      } else {
-        offsetX += element.offsetLeft
-        offsetY += element.offsetTop
-      }
-
-      getOffset(element.parentNode)
-    }
-    getOffset(target)
-    return { x: offsetX, y: offsetY }
-  }
-
+  static get name () { return 'Drag' }
   get events () {
     const node = this.p.node.selector
     return {
@@ -48,38 +26,39 @@ export default class Drag extends Behavior {
   /**
    * TODO show all selected nodes while dragging?
    */
-  _start (e) {
+  _start (e, currentTarget) {
     if (!this._enabled) return false
-    this._dragged = $(e.currentTarget)
-    this._draggedClone = this._dragged.clone().addClass('dragging')
+    this._dragged = currentTarget
+    this._draggedClone = this._dragged.cloneNode(true)
+    this._draggedClone.classList.add('dragging')
     this.eventOffset = { x: e.offsetX, y: e.offsetY }
-    const offset = Drag._getRelativeOffset(e, this.container[0])
+    const offset = getRelativeOffset(e, this.container)
     this._startPoint = { x: offset.x, y: offset.y }
-    this.container.append(this._draggedClone)
-    this._draggedClone.translate(offset.x - this.eventOffset.x, offset.y - this.eventOffset.y)
+    this.container.appendChild(this._draggedClone)
+    translate(this._draggedClone, offset.x - this.eventOffset.x, offset.y - this.eventOffset.y)
     return super._start()
   }
 
   _run (e) {
     if (!this._inProgress) return false
-    const offset = Drag._getRelativeOffset(e, this.container[0])
+    const offset = getRelativeOffset(e, this.container)
     if (Math.abs(offset.x - this._startPoint.x) < 3 &&
          Math.abs(offset.y - this._startPoint.y) < 3) return false
 
-    if (!this._draggedClone.is(':visible')) {
+    if (!isVisible(this._draggedClone)) {
       this._draggedClone.show()
     }
-    this._draggedClone.translate(offset.x - this.eventOffset.x, offset.y - this.eventOffset.y)
+    translate(this._draggedClone, offset.x - this.eventOffset.x, offset.y - this.eventOffset.y)
     return super._run()
   }
 
-  _prepareDrop (e) {
+  _prepareDrop (e, currentTarget) {
     if (!this._inProgress) return
 
     // restrict self dropping
-    if (e.currentTarget === this._dragged[0]) return
-    this._target = $(e.currentTarget)
-    this._target.addClass('dropTarget')
+    if (currentTarget === this._dragged) return
+    this._target = currentTarget
+    this._target.classList.add('dropTarget')
   }
 
   _disposeDrop (e) {
@@ -97,13 +76,13 @@ export default class Drag extends Behavior {
       this.emit('drop', this._target, this._dragged)
       delete this._target
     } else {
-      const offset = Drag._getRelativeOffset(e, this.container[0])
+      const offset = getRelativeOffset(e, this.container)
       const delta = {}
       delta.x = offset.x - this._startPoint.x
       delta.y = offset.y - this._startPoint.y
 
       if (Math.abs(delta.x) > this.p.moveThreshold || Math.abs(delta.y) > this.p.moveThreshold) {
-        this.emit('move', delta, this._dragged[0])
+        this.emit('move', delta, this._dragged)
       }
     }
 

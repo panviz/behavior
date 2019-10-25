@@ -3,17 +3,18 @@
  * @event change fires on every little move
  * @event end fires on finishing move
  */
+import { translateX, translateY } from '@graphiy/transform'
 import Behavior from '../behavior'
 import './pan.scss'
 
 export default class Pan extends Behavior {
+  static get name () { return 'Pan' }
   static get defaults () {
     return {
       wheelStep: 1,
       keyStep: 30,
     }
   }
-
   static get controlKeys () { return ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'] }
   /**
    * _startPoint - coordinates of pointing device relative to the canvas
@@ -24,9 +25,7 @@ export default class Pan extends Behavior {
     super(p)
     this._startPoint = {}
     this._changed = false
-
     this._element = p.element
-    $(document).on('keydown', this._onKeyDown.bind(this))
   }
 
   get events () {
@@ -37,13 +36,19 @@ export default class Pan extends Behavior {
       mousewheel: this._onScroll,
     }
   }
+
+  get globalEvents () {
+    return {
+      keydown: this._onKeyDown,
+    }
+  }
   /**
    * @return {x,y} current canvas absolute position
    */
   getPosition () {
     const pos = {}
-    pos.x = _.toNumber(this._element.translateX())
-    pos.y = _.toNumber(this._element.translateY())
+    pos.x = _.toNumber(translateX(this._element))
+    pos.y = _.toNumber(translateY(this._element))
     return pos
   }
   /**
@@ -68,8 +73,8 @@ export default class Pan extends Behavior {
    * Move canvas to absolute position {x,y}
    */
   _moveTo (x, y, silent) {
-    if (y !== undefined) this._element.translateY(y)
-    if (x !== undefined) this._element.translateX(x)
+    if (x !== undefined) translateX(this._element, x)
+    if (y !== undefined) translateY(this._element, y)
     if (!silent) this.emit('change')
   }
   /**
@@ -114,7 +119,6 @@ export default class Pan extends Behavior {
   }
 
   _onMouseDown (e) {
-    if (e.target !== this.container[0] && e.target !== this._element[0]) return
     this._start(e.pageX, e.pageY)
   }
 
@@ -122,8 +126,7 @@ export default class Pan extends Behavior {
     this._run(e.pageX, e.pageY)
   }
 
-  _onScroll (_e) {
-    const e = _.isUndefined(_e.deltaX) ? _e.originalEvent : _e
+  _onScroll (e) {
     let turnOff = false
     if (!this._enabled) {
       this._enabled = true
@@ -140,7 +143,6 @@ export default class Pan extends Behavior {
   }
 
   _onKeyDown (e) {
-    e = e.originalEvent // eslint-disable-line
     if (!this.enabled || !_.includes(Pan.controlKeys, e.key)) return
 
     this._start(0, 0)
