@@ -13,7 +13,9 @@ import puppeteer from 'puppeteer'
 
   page.on('console', (msg) => {
     if (msg.type() === 'log') console.log(msg.text()) // eslint-disable-line
-    if (msg.text().startsWith('Executed')) browser.close()
-    else process.exit(1)
+    if (msg.text().startsWith('Executed')) {
+      browser.close()
+      if (msg.text().includes('FAILED')) process.exit(1)
+    }
   })
 })()

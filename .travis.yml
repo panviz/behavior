@@ -5,6 +5,7 @@ node_js:
 install:
   - yarn install
 before_script:
-  - yarn start:test
+  - yarn start:test &
+  - while ! echo exit | curl --fail --head --silent http://localhost:8006/test; do sleep 1; done
 script:
   - yarn test
