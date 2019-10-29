@@ -20,7 +20,8 @@
     "build:demo": "cd demo/ && webpack --mode=production",
     "lint": "eslint . --ignore-path .gitignore",
     "start": "cd demo/ && webpack-dev-server --port 8006",
-    "test": "webpack-dev-server --config webpack.config.babel.js --port 8006",
+    "start:test": "webpack-dev-server --config webpack.config.babel.js --port 8006",
+    "test": "babel-node test/runner.js",
     "deploy": "cd demo/ && rsync -azP --delete dist/ index.html data.json daviste.com:/home/dmitra/daviste.com/static/demo/graphiy-behavior"
   },
   "babel": {
@@ -56,6 +57,7 @@
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
+    "@babel/node": "^7.6.3",
     "@babel/preset-env": "^7.5.5",
     "@babel/register": "^7.5.5",
     "@graphiy/eslint-config": "^0.1.0",
@@ -65,9 +67,11 @@
     "d3-selection": "^1.4.0",
     "eslint": "^6.3.0",
     "jasmine-core": "^3.4.0",
+    "jasmine-spec-reporter": "^4.2.1",
     "lodash": "^4.17.15",
     "node-sass": "^4.9.0",
     "pre-commit": "^1.2.2",
+    "puppeteer": "^2.0.0",
     "raw-loader": "^3.1.0",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.0",
